@@ -56,13 +56,20 @@ Additional requirements on top of standard Deep Research:
 
 Gather primary sources only: papers that introduced key ideas, official lab/product blogs, posts from builders, canonical "build it from scratch" repositories. Not summaries. Not explainers.
 
+Cover three modalities deliberately -- a text-only bundle leaves the best material on the table:
+- **Text** -- papers, official blogs, docs, source repos.
+- **Video** -- conference talks, the author's own walkthrough, technical podcasts. Often the only place a builder says *why* a decision was made out loud. Pull the transcript so it digests like text.
+- **X / social threads** -- builders ship their sharpest, most current thinking in threads weeks before it reaches a blog. High signal-to-noise. A thread from the primary source counts as a primary source; a thread reacting to one does not.
+
+A research output that cites only articles is under-collected. For any non-trivial topic, aim for at least one strong video and one builder thread alongside the written sources.
+
 Three ordered steps per source -- no shortcuts, no merging:
 
-1. **Discover** -- use an installed search plugin (e.g., PipeLLM) to map the landscape, then deep-search the 2-3 most promising sub-topics. No plugin: use the environment's native web search. Output is a URL list; do not fetch content here.
-2. **Fetch** -- every URL goes through `/read` when available. `/read` owns the proxy cascade, paywall detection, and platform routing (WeChat, Feishu, PDF, GitHub). Native fetch tools and raw `curl` silently fail on JS-heavy or paywalled sites and skip all of that. If `/read` is missing (Pre-check warned), fall back to native fetch and accept reduced coverage.
-3. **File** -- tell `/read` the research project's source directory when one exists. If no directory was specified, let `/read` use a per-session temp directory and return the saved path. Move or index saved files into sub-topic directories after fetch returns. Move, don't refetch.
+1. **Discover** -- use an installed search plugin (e.g., PipeLLM) to map the landscape, then deep-search the 2-3 most promising sub-topics. No plugin: use the environment's native web search. Search video and social platforms too (YouTube, X), not just the open web -- the strongest builder content often never gets indexed as an article. Output is a URL list; do not fetch content here.
+2. **Fetch** -- every text URL goes through `/read` when available. `/read` owns the proxy cascade, paywall detection, and platform routing (WeChat, Feishu, PDF, GitHub). Native fetch tools and raw `curl` silently fail on JS-heavy or paywalled sites and skip all of that. If `/read` is missing (Pre-check warned), fall back to native fetch and accept reduced coverage. For video and X, `/read` usually can't reach the content -- route those through the platform CLI the environment provides (e.g. `opencli youtube` / `opencli twitter` for transcripts and threads; `yt-dlp --write-auto-sub --skip-download` to pull a transcript when no API path exists). Capture the transcript or full thread text, not just the link.
+3. **File** -- tell `/read` the research project's source directory when one exists. If no directory was specified, let `/read` use a per-session temp directory and return the saved path. Save video transcripts and thread captures as text files in the same source directory. Move or index saved files into sub-topic directories after fetch returns. Move, don't refetch.
 
-Target: 5-10 sources for a blog post, 15-20 for a deep technical survey.
+Target: 5-10 sources for a blog post, 15-20 for a deep technical survey -- counting video transcripts and threads as sources.
 
 ## Phase 2: Digest
 
@@ -128,6 +135,7 @@ When it reads clean from start to finish, the draft is ready for the user to pub
 | What happened | Rule |
 |---------------|------|
 | Collected 30 secondary explainers instead of primary sources | Phase 1 targets papers, official blogs, and repos by builders. Summaries are not sources. |
+| Collected only articles; skipped video talks and X threads | Phase 1 mandates three modalities. Text-only misses where builders actually explain their reasoning. Pull at least one strong video transcript and one primary-source thread. |
 | Used native fetch tools or `curl` on URLs while `/read` was installed | Phase 1 fetch is not optional. `/read` owns the proxy cascade, paywall detection, and platform routing. Bypassing it silently loses coverage on paywalled, JS-heavy, or Chinese-platform pages. |
 | Treated a convincing explainer as ground truth | Ask: does this appear in at least two different contexts from the same source? |
 | Phase 2 wrote summaries instead of teaching the concept | Digest means building the mental model. Summarizing is not digesting. |
